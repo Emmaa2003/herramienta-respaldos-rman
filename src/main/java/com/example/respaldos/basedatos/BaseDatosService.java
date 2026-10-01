@@ -1,5 +1,6 @@
 package com.example.respaldos.basedatos;
 
+import com.example.respaldos.aprobacion.InvalidadorScripts;
 import com.example.respaldos.comun.ConflictoException;
 import com.example.respaldos.comun.Mensaje;
 import com.example.respaldos.comun.NoEncontradoException;
@@ -32,10 +33,12 @@ public class BaseDatosService {
     private final CatalogoOracle catalogo;
     private final ReglasInspeccion reglas;
     private final PropiedadesDocker propiedadesDocker;
+    private final InvalidadorScripts invalidador;
 
     public BaseDatosService(BaseDatosRepository bases, EstrategiaRepository estrategias,
                             ClienteContenedor cliente, CatalogoOracle catalogo, ReglasInspeccion reglas,
-                            PropiedadesDocker propiedadesDocker) {
+                            PropiedadesDocker propiedadesDocker, InvalidadorScripts invalidador) {
+        this.invalidador = invalidador;
         this.bases = bases;
         this.estrategias = estrategias;
         this.cliente = cliente;
@@ -72,9 +75,11 @@ public class BaseDatosService {
                 || !base.getServicio().equalsIgnoreCase(solicitud.servicio().trim());
         copiar(solicitud, base);
         if (cambiaDestino) {
-            // Lo inspeccionado ya no describe a la base nueva.
+            // Lo inspeccionado ya no describe a la base nueva, y los scripts generados para
+            // la anterior tampoco.
             base.setModoArchivado(null);
             base.setFechaInspeccion(null);
+            estrategias.findByBaseDatosId(id).forEach(invalidador::invalidarSiCambio);
         }
         return BaseDatosRespuesta.de(base);
     }

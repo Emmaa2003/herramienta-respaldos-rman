@@ -6,8 +6,9 @@ import com.example.respaldos.modelo.ScriptRman;
 import java.time.LocalDateTime;
 
 /**
- * @param vigente true si la estrategia no cambio desde que se genero el script
- *                (la huella de configuracion coincide)
+ * @param vigente            true si la estrategia no cambio desde que se genero el script
+ *                           (la huella de configuracion coincide)
+ * @param comentarioRevision comentario de la aprobacion o motivo del rechazo
  */
 public record ScriptRespuesta(
         Long id,
@@ -20,12 +21,16 @@ public record ScriptRespuesta(
         boolean vigente,
         LocalDateTime fechaGeneracion,
         String aprobadoPor,
-        LocalDateTime fechaAprobacion) {
+        LocalDateTime fechaAprobacion,
+        String rechazadoPor,
+        LocalDateTime fechaRechazo,
+        String comentarioRevision) {
 
-    static ScriptRespuesta de(ScriptRman s) {
+    public static ScriptRespuesta de(ScriptRman s) {
         boolean vigente = s.getHashConfiguracion().equals(HuellaConfiguracion.de(s.getEstrategia()));
         return new ScriptRespuesta(s.getId(), s.getEstrategia().getId(), s.getVersion(), s.getContenido(),
                 s.getHashContenido(), s.getHashConfiguracion(), s.getEstado(), vigente, s.getFechaGeneracion(),
-                s.getAprobadoPor(), s.getFechaAprobacion());
+                s.getAprobadoPor(), s.getFechaAprobacion(), s.getRechazadoPor(), s.getFechaRechazo(),
+                s.getComentarioRevision());
     }
 }

@@ -49,6 +49,21 @@ public class ScriptRman {
     @Column(name = "fecha_aprobacion")
     private LocalDateTime fechaAprobacion;
 
+    /** Comentario de la aprobacion o motivo del rechazo. */
+    @Column(name = "comentario_revision", length = 1000)
+    private String comentarioRevision;
+
+    @Column(name = "rechazado_por", length = 100)
+    private String rechazadoPor;
+
+    @Column(name = "fecha_rechazo")
+    private LocalDateTime fechaRechazo;
+
+    /** true si el texto no fue alterado desde que se genero (la huella sigue coincidiendo). */
+    public boolean contenidoIntegro(String hashCalculado) {
+        return hashContenido.equals(hashCalculado);
+    }
+
     public Long getId() { return id; }
 
     public Estrategia getEstrategia() { return estrategia; }
@@ -76,4 +91,13 @@ public class ScriptRman {
 
     public LocalDateTime getFechaAprobacion() { return fechaAprobacion; }
     public void setFechaAprobacion(LocalDateTime fechaAprobacion) { this.fechaAprobacion = fechaAprobacion; }
+
+    public String getComentarioRevision() { return comentarioRevision; }
+    public void setComentarioRevision(String comentarioRevision) { this.comentarioRevision = comentarioRevision; }
+
+    public String getRechazadoPor() { return rechazadoPor; }
+    public void setRechazadoPor(String rechazadoPor) { this.rechazadoPor = rechazadoPor; }
+
+    public LocalDateTime getFechaRechazo() { return fechaRechazo; }
+    public void setFechaRechazo(LocalDateTime fechaRechazo) { this.fechaRechazo = fechaRechazo; }
 }

@@ -5,9 +5,13 @@ import com.example.respaldos.modelo.TipoElemento;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.List;
+
 public interface EstrategiaRepository extends JpaRepository<Estrategia, Long> {
 
     boolean existsByBaseDatosId(Long baseDatosId);
+
+    List<Estrategia> findByBaseDatosId(Long baseDatosId);
 
     boolean existsByNombreIgnoreCase(String nombre);
 

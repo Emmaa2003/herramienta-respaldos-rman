@@ -1,5 +1,6 @@
 package com.example.respaldos.estrategia;
 
+import com.example.respaldos.aprobacion.InvalidadorScripts;
 import com.example.respaldos.comun.ConflictoException;
 import com.example.respaldos.comun.NoEncontradoException;
 import com.example.respaldos.comun.SolicitudInvalidaException;
@@ -42,13 +43,16 @@ public class EstrategiaService {
     private final BaseDatosRepository bases;
     private final ScriptRmanRepository scripts;
     private final AlertaRepository alertas;
+    private final InvalidadorScripts invalidador;
 
     public EstrategiaService(EstrategiaRepository estrategias, BaseDatosRepository bases,
-                             ScriptRmanRepository scripts, AlertaRepository alertas) {
+                             ScriptRmanRepository scripts, AlertaRepository alertas,
+                             InvalidadorScripts invalidador) {
         this.estrategias = estrategias;
         this.bases = bases;
         this.scripts = scripts;
         this.alertas = alertas;
+        this.invalidador = invalidador;
     }
 
     @Transactional(readOnly = true)
@@ -81,6 +85,7 @@ public class EstrategiaService {
             throw new ConflictoException("Ya existe una estrategia con el nombre '" + solicitud.nombre() + "'.");
         }
         aplicar(solicitud, estrategia);
+        invalidador.invalidarSiCambio(estrategia);
         return EstrategiaRespuesta.de(estrategias.saveAndFlush(estrategia));
     }
 
