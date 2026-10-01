@@ -2,6 +2,8 @@ package com.example.respaldos.modelo;
 
 import jakarta.persistence.*;
 
+import java.util.Objects;
+
 /**
  * Un elemento del QUE respaldar. nombreObjeto solo aplica a TABLESPACE (nombre)
  * y DATAFILE (numero o ruta); para los demas tipos es null.
@@ -31,6 +33,11 @@ public class EstrategiaElemento {
     public EstrategiaElemento(TipoElemento tipoElemento, String nombreObjeto) {
         this.tipoElemento = tipoElemento;
         this.nombreObjeto = nombreObjeto;
+    }
+
+    /** true si ambos se refieren al mismo tipo y objeto. */
+    public boolean mismoObjeto(EstrategiaElemento otro) {
+        return tipoElemento == otro.tipoElemento && Objects.equals(nombreObjeto, otro.nombreObjeto);
     }
 
     public Long getId() { return id; }

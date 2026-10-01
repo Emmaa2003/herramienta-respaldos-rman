@@ -3,6 +3,7 @@ package com.example.respaldos.comun;
 import com.example.respaldos.infraestructura.AmbienteException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -33,6 +34,14 @@ public class ManejadorErrores {
     @ExceptionHandler(AmbienteException.class)
     ProblemDetail ambiente(AmbienteException e) {
         return ProblemDetail.forStatusAndDetail(HttpStatus.SERVICE_UNAVAILABLE, e.getMessage());
+    }
+
+    /** JSON mal formado o con valores que no corresponden (p. ej. un tipo de respaldo inexistente). */
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    ProblemDetail jsonIlegible(HttpMessageNotReadableException e) {
+        Throwable causa = e.getMostSpecificCause();
+        return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST,
+                "No se pudo leer la solicitud: " + causa.getMessage().lines().findFirst().orElse(""));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.EnumSet;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -46,7 +47,7 @@ class ModeloPersistenciaTest {
         programacion.setFechaInicio(LocalDate.of(2026, 10, 1));
         programacion.setHora(LocalTime.of(23, 0));
         programacion.setFrecuencia(Frecuencia.SEMANAL);
-        programacion.setDiasSemana("LUN,JUE");
+        programacion.setDiasSemana(EnumSet.of(DiaSemana.LUN, DiaSemana.JUE));
         programacion.setVentanaInicio(LocalTime.of(22, 30));
         programacion.setVentanaFin(LocalTime.of(5, 0));
         estrategia.asignarProgramacion(programacion);
@@ -94,6 +95,7 @@ class ModeloPersistenciaTest {
         assertThat(leida.getElementos()).hasSize(3);
         assertThat(leida.getProgramacion().getHora()).isEqualTo(LocalTime.of(23, 0));
         assertThat(leida.getProgramacion().getVentanaFin()).isEqualTo(LocalTime.of(5, 0));
+        assertThat(leida.getProgramacion().getDiasSemana()).containsExactly(DiaSemana.LUN, DiaSemana.JUE);
         assertThat(leida.getFechaCreacion()).isNotNull();
 
         Ejecucion ejecucionLeida = ejecuciones.findById(ejecucion.getId()).orElseThrow();

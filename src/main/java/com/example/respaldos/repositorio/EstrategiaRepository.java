@@ -9,6 +9,10 @@ public interface EstrategiaRepository extends JpaRepository<Estrategia, Long> {
 
     boolean existsByBaseDatosId(Long baseDatosId);
 
+    boolean existsByNombreIgnoreCase(String nombre);
+
+    boolean existsByNombreIgnoreCaseAndIdNot(String nombre, Long id);
+
     /** true si alguna estrategia activa de la base incluye el elemento indicado. */
     @Query("""
             select count(e) > 0 from Estrategia e join e.elementos el

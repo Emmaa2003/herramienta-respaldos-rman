@@ -86,6 +86,20 @@ public class Estrategia {
         elemento.setEstrategia(null);
     }
 
+    /**
+     * Deja exactamente los elementos indicados, conservando los que ya existian.
+     * No se vacia y vuelve a llenar la lista porque Hibernate inserta antes de borrar
+     * y el mismo elemento chocaria con la restriccion unica.
+     */
+    public void reemplazarElementos(List<EstrategiaElemento> nuevos) {
+        elementos.removeIf(actual -> nuevos.stream().noneMatch(actual::mismoObjeto));
+        for (EstrategiaElemento nuevo : nuevos) {
+            if (elementos.stream().noneMatch(nuevo::mismoObjeto)) {
+                agregarElemento(nuevo);
+            }
+        }
+    }
+
     public void asignarProgramacion(Programacion nueva) {
         if (nueva != null) {
             nueva.setEstrategia(this);

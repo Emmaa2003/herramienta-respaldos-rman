@@ -6,6 +6,8 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.EnumSet;
+import java.util.Set;
 
 /** CUANDO respaldar: programacion de una estrategia. */
 @Entity
@@ -31,9 +33,10 @@ public class Programacion {
     @Column(nullable = false, length = 20)
     private Frecuencia frecuencia;
 
-    /** Dias para frecuencia SEMANAL, p. ej. "LUN,MIE,VIE". */
+    /** Dias para frecuencia SEMANAL; se guarda como "LUN,MIE,VIE". */
+    @Convert(converter = DiasSemanaConverter.class)
     @Column(name = "dias_semana", length = 30)
-    private String diasSemana;
+    private Set<DiaSemana> diasSemana = EnumSet.noneOf(DiaSemana.class);
 
     /** Cada cuantas horas (CADA_N_HORAS) o cada cuantos dias/semanas/meses. */
     @Column(nullable = false)
@@ -71,8 +74,11 @@ public class Programacion {
     public Frecuencia getFrecuencia() { return frecuencia; }
     public void setFrecuencia(Frecuencia frecuencia) { this.frecuencia = frecuencia; }
 
-    public String getDiasSemana() { return diasSemana; }
-    public void setDiasSemana(String diasSemana) { this.diasSemana = diasSemana; }
+    public Set<DiaSemana> getDiasSemana() { return diasSemana; }
+    public void setDiasSemana(Set<DiaSemana> diasSemana) {
+        this.diasSemana = diasSemana == null || diasSemana.isEmpty()
+                ? EnumSet.noneOf(DiaSemana.class) : EnumSet.copyOf(diasSemana);
+    }
 
     public int getIntervalo() { return intervalo; }
     public void setIntervalo(int intervalo) { this.intervalo = intervalo; }
