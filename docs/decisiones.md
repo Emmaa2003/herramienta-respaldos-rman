@@ -82,7 +82,8 @@ que el administrador decida.
 ## Limitaciones conocidas
 
 - **Sin autenticación.** "Aprobado por", "rechazado por" y "atendida por" registran el
-  nombre enviado, sin verificar identidad.
+  nombre enviado, sin verificar identidad. En el frontend ese nombre se escribe en el
+  campo "Administrador" y se guarda en el navegador.
 - **Catálogo limitado a XEPDB1.** El catálogo se lee con la conexión de la app
   (`respaldos@XEPDB1`); no ve los tablespaces de la raíz del CDB. `BACKUP DATABASE` sí
   respalda todo el CDB.
