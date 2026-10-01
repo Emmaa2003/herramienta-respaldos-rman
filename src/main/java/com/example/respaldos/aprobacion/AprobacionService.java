@@ -94,14 +94,38 @@ public class AprobacionService {
         if (!estrategias.existsById(estrategiaId)) {
             throw new NoEncontradoException("No existe la estrategia con id " + estrategiaId + ".");
         }
+        Ejecutable e = evaluarEjecutable(estrategiaId);
+        if (e.script() == null && e.sinAprobado()) {
+            throw new NoEncontradoException(e.motivo());
+        }
+        if (e.script() == null) {
+            throw new ConflictoException(e.motivo());
+        }
+        return e.script();
+    }
+
+    /**
+     * Igual que {@link #scriptEjecutable} pero sin lanzar excepciones: el programador lo usa
+     * dentro de su propia transaccion, que no debe quedar marcada para rollback.
+     */
+    @Transactional(readOnly = true)
+    public Ejecutable evaluarEjecutable(Long estrategiaId) {
         List<ScriptRman> aprobados = scripts.findByEstrategiaIdAndEstado(estrategiaId, EstadoScript.APROBADO);
         if (aprobados.isEmpty()) {
-            throw new NoEncontradoException("La estrategia no tiene un script aprobado. Genere el script y "
+            return new Ejecutable(null, true, "La estrategia no tiene un script aprobado. Genere el script y "
                     + "apruebelo antes de programarla o ejecutarla.");
         }
         ScriptRman script = aprobados.getFirst();
-        exigirIntegroYVigente(script);
-        return script;
+        String motivo = motivoNoUsable(script);
+        return motivo == null ? new Ejecutable(script, false, null) : new Ejecutable(null, false, motivo);
+    }
+
+    /**
+     * @param script      el script que se puede ejecutar, o null
+     * @param sinAprobado true si el motivo es que no hay ninguno aprobado
+     * @param motivo      por que no hay script ejecutable (null si lo hay)
+     */
+    public record Ejecutable(ScriptRman script, boolean sinAprobado, String motivo) {
     }
 
     private static void exigirPendiente(ScriptRman script, String accion) {
@@ -112,14 +136,23 @@ public class AprobacionService {
     }
 
     private static void exigirIntegroYVigente(ScriptRman script) {
+        String motivo = motivoNoUsable(script);
+        if (motivo != null) {
+            throw new ConflictoException(motivo);
+        }
+    }
+
+    /** null si el script esta integro y vigente; si no, el motivo. */
+    private static String motivoNoUsable(ScriptRman script) {
         if (!script.contenidoIntegro(HuellaConfiguracion.sha256(script.getContenido()))) {
-            throw new ConflictoException("El contenido del script version " + script.getVersion()
-                    + " fue alterado despues de generarse. No se puede usar; genere uno nuevo.");
+            return "El contenido del script version " + script.getVersion()
+                    + " fue alterado despues de generarse. No se puede usar; genere uno nuevo.";
         }
         if (!script.getHashConfiguracion().equals(HuellaConfiguracion.de(script.getEstrategia()))) {
-            throw new ConflictoException("La estrategia cambio despues de generar el script version "
-                    + script.getVersion() + ". Genere el script de nuevo y reviselo.");
+            return "La estrategia cambio despues de generar el script version "
+                    + script.getVersion() + ". Genere el script de nuevo y reviselo.";
         }
+        return null;
     }
 
     private ScriptRman buscar(Long id) {

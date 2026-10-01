@@ -12,6 +12,7 @@ import com.example.respaldos.modelo.EstrategiaElemento;
 import com.example.respaldos.modelo.Frecuencia;
 import com.example.respaldos.modelo.Programacion;
 import com.example.respaldos.modelo.TipoElemento;
+import com.example.respaldos.programacion.CalculadoraEjecuciones;
 import com.example.respaldos.repositorio.AlertaRepository;
 import com.example.respaldos.repositorio.BaseDatosRepository;
 import com.example.respaldos.repositorio.EstrategiaRepository;
@@ -20,6 +21,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -44,15 +46,17 @@ public class EstrategiaService {
     private final ScriptRmanRepository scripts;
     private final AlertaRepository alertas;
     private final InvalidadorScripts invalidador;
+    private final CalculadoraEjecuciones calculadora;
 
     public EstrategiaService(EstrategiaRepository estrategias, BaseDatosRepository bases,
                              ScriptRmanRepository scripts, AlertaRepository alertas,
-                             InvalidadorScripts invalidador) {
+                             InvalidadorScripts invalidador, CalculadoraEjecuciones calculadora) {
         this.estrategias = estrategias;
         this.bases = bases;
         this.scripts = scripts;
         this.alertas = alertas;
         this.invalidador = invalidador;
+        this.calculadora = calculadora;
     }
 
     @Transactional(readOnly = true)
@@ -89,9 +93,14 @@ public class EstrategiaService {
         return EstrategiaRespuesta.de(estrategias.saveAndFlush(estrategia));
     }
 
+    /** Al activar se recalcula la proxima ejecucion desde ahora (no se arrastran las de cuando estaba inactiva). */
     public EstrategiaRespuesta activar(Long id) {
         Estrategia estrategia = buscar(id);
         estrategia.setActiva(true);
+        Programacion p = estrategia.getProgramacion();
+        if (p != null) {
+            p.setProximaEjecucion(calculadora.siguienteDesde(p, LocalDateTime.now()));
+        }
         return EstrategiaRespuesta.de(estrategias.saveAndFlush(estrategia));
     }
 
@@ -201,7 +210,7 @@ public class EstrategiaService {
      * Modifica la programacion existente en lugar de reemplazarla: la tabla admite una
      * sola por estrategia y Hibernate insertaria la nueva antes de borrar la anterior.
      */
-    private static void aplicarProgramacion(ProgramacionDatos datos, Estrategia estrategia) {
+    private void aplicarProgramacion(ProgramacionDatos datos, Estrategia estrategia) {
         if (datos == null) {
             estrategia.asignarProgramacion(null);
             return;
@@ -218,8 +227,8 @@ public class EstrategiaService {
         p.setIntervalo(datos.intervalo() == null ? 1 : datos.intervalo());
         p.setVentanaInicio(datos.ventanaInicio() == null ? null : datos.ventanaInicio().withSecond(0).withNano(0));
         p.setVentanaFin(datos.ventanaFin() == null ? null : datos.ventanaFin().withSecond(0).withNano(0));
-        // La proxima ejecucion la calcula el programador; un cambio de horario la invalida.
-        p.setProximaEjecucion(null);
+        // Un cambio de horario se refleja de inmediato en la proxima ejecucion.
+        p.setProximaEjecucion(calculadora.siguienteDesde(p, LocalDateTime.now()));
     }
 
     private static String quitarBarraFinal(String ruta) {
