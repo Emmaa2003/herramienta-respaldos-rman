@@ -13,4 +13,6 @@ public interface AlertaRepository extends JpaRepository<Alerta, Long> {
     boolean existsByEstrategiaIdAndCodigoAndEstado(Long estrategiaId, String codigo, EstadoAlerta estado);
 
     List<Alerta> findByEstrategiaIdOrderByIdDesc(Long estrategiaId);
+
+    List<Alerta> findByEstado(EstadoAlerta estado);
 }
