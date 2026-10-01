@@ -1,7 +1,9 @@
 package com.example.respaldos.comun;
 
 import com.example.respaldos.infraestructura.AmbienteException;
+import com.example.respaldos.validacion.ValidacionFallidaException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -28,6 +30,20 @@ public class ManejadorErrores {
     @ExceptionHandler(SolicitudInvalidaException.class)
     ProblemDetail solicitudInvalida(SolicitudInvalidaException e) {
         return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, e.getMessage());
+    }
+
+    /** La estrategia tiene hallazgos bloqueantes; se devuelven para que el administrador los corrija. */
+    @ExceptionHandler(ValidacionFallidaException.class)
+    ProblemDetail validacionFallida(ValidacionFallidaException e) {
+        ProblemDetail problema = ProblemDetail.forStatusAndDetail(HttpStatusCode.valueOf(422), e.getMessage());
+        problema.setProperty("hallazgos", e.getResultado().hallazgos());
+        return problema;
+    }
+
+    /** Error interno detectado por la propia aplicacion (p. ej. un script que no pasa checksyntax). */
+    @ExceptionHandler(IllegalStateException.class)
+    ProblemDetail estadoInterno(IllegalStateException e) {
+        return ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
     }
 
     /** El ambiente (Docker, Oracle) no respondio como se esperaba. */

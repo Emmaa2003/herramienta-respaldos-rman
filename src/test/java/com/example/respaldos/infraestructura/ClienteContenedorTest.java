@@ -31,6 +31,18 @@ class ClienteContenedorTest {
     }
 
     @Test
+    void verificarSintaxisUsaChecksyntaxSinConectarseALaBase() {
+        ejecutor.responder(0, "The command has no syntax errors");
+
+        cliente.verificarSintaxisRman("oracle-xe", "BACKUP DATABASE;\n");
+
+        assertThat(ejecutor.comando).containsExactly("docker", "exec", "-i", "oracle-xe", "rman", "checksyntax");
+        assertThat(ejecutor.comando).doesNotContain("target");
+        assertThat(ejecutor.entrada).isEqualTo("BACKUP DATABASE;\n");
+        assertThat(ejecutor.tiempoMaximo).isEqualTo(Duration.ofSeconds(30));
+    }
+
+    @Test
     void rechazaContenedoresNoPermitidosSinEjecutarNada() {
         assertThatThrownBy(() -> cliente.ejecutarRman("oracle-local", "BACKUP DATABASE;"))
                 .isInstanceOf(AmbienteException.class)

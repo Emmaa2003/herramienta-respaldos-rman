@@ -33,6 +33,16 @@ public class ClienteContenedor {
         return ejecutor.ejecutar(comando, script, propiedades.tiempoMaximoRman());
     }
 
+    /**
+     * Revisa la sintaxis de un script con {@code rman checksyntax}: no se conecta a la base
+     * ni ejecuta nada. Codigo 0 = "The command has no syntax errors".
+     */
+    public ResultadoProceso verificarSintaxisRman(String contenedor, String script) {
+        validarContenedor(contenedor);
+        List<String> comando = List.of(propiedades.ejecutable(), "exec", "-i", contenedor, "rman", "checksyntax");
+        return ejecutor.ejecutar(comando, script, propiedades.tiempoMaximoComando());
+    }
+
     /** Tamano en bytes del archivo, o vacio si no existe. Sirve para verificar las piezas de respaldo. */
     public Optional<Long> tamanoArchivo(String contenedor, String ruta) {
         ResultadoProceso r = comandoAuxiliar(contenedor, "stat", "-c", "%s", "--", validarRuta(ruta));

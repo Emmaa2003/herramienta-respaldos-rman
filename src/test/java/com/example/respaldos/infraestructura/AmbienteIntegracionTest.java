@@ -42,6 +42,16 @@ class AmbienteIntegracionTest {
     }
 
     @Test
+    void checksyntaxDistingueScriptsCorrectosDeErroneos() {
+        assertThat(cliente.verificarSintaxisRman(CONTENEDOR, "RUN {\n  BACKUP DATABASE;\n}\n").terminoSinError())
+                .isTrue();
+
+        ResultadoProceso error = cliente.verificarSintaxisRman(CONTENEDOR, "BACKUP DATABAS;\n");
+        assertThat(error.codigoSalida()).isNotZero();
+        assertThat(error.salida()).contains("RMAN-01009");
+    }
+
+    @Test
     void espacioDelDestinoDeRespaldos() {
         EspacioDisco espacio = cliente.espacioDisco(CONTENEDOR, "/opt/oracle/oradata/respaldos");
 
