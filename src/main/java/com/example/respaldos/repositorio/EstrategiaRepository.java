@@ -19,4 +19,12 @@ public interface EstrategiaRepository extends JpaRepository<Estrategia, Long> {
             where e.baseDatos.id = :baseDatosId and e.activa = true and el.tipoElemento = :tipo
             """)
     boolean existeActivaConElemento(Long baseDatosId, TipoElemento tipo);
+
+    /** Igual que existeActivaConElemento, pero sin contar la estrategia indicada. */
+    @Query("""
+            select count(e) > 0 from Estrategia e join e.elementos el
+            where e.baseDatos.id = :baseDatosId and e.activa = true and el.tipoElemento = :tipo
+              and e.id <> :excluida
+            """)
+    boolean existeOtraActivaConElemento(Long baseDatosId, TipoElemento tipo, Long excluida);
 }

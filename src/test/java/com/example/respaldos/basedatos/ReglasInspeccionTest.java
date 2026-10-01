@@ -108,6 +108,6 @@ class ReglasInspeccionTest {
     }
 
     private static InfoBaseDatos info(ModoArchivado modo) {
-        return new InfoBaseDatos("XE", modo, "XEPDB1");
+        return new InfoBaseDatos("XE", modo, "READ WRITE", "XEPDB1");
     }
 }

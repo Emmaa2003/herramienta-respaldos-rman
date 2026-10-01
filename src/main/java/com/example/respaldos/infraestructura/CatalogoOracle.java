@@ -30,11 +30,12 @@ public class CatalogoOracle {
 
     public InfoBaseDatos informacionBase() {
         return consultar(() -> jdbc.queryForObject(
-                "SELECT name, log_mode, SYS_CONTEXT('USERENV', 'CON_NAME') FROM v$database",
+                "SELECT name, log_mode, open_mode, SYS_CONTEXT('USERENV', 'CON_NAME') FROM v$database",
                 (rs, i) -> new InfoBaseDatos(
                         rs.getString(1),
                         ModoArchivado.valueOf(rs.getString(2)),
-                        rs.getString(3))));
+                        rs.getString(3),
+                        rs.getString(4))));
     }
 
     public List<TablespaceInfo> tablespaces() {
@@ -60,8 +61,15 @@ public class CatalogoOracle {
         }
     }
 
-    /** @param pdb contenedor (PDB) al que pertenece el catalogo leido */
-    public record InfoBaseDatos(String nombre, ModoArchivado modoArchivado, String pdb) {
+    /**
+     * @param modoApertura OPEN_MODE de V$DATABASE (READ WRITE, MOUNTED, ...)
+     * @param pdb          contenedor (PDB) al que pertenece el catalogo leido
+     */
+    public record InfoBaseDatos(String nombre, ModoArchivado modoArchivado, String modoApertura, String pdb) {
+
+        public boolean abierta() {
+            return modoApertura != null && modoApertura.startsWith("READ");
+        }
     }
 
     /** @param contenido PERMANENT, UNDO o TEMPORARY (los TEMPORARY no se respaldan con RMAN) */
