@@ -16,8 +16,10 @@ Los PDFs de la asignación están en /docs.
 - Contenedor: `oracle-xe` (imagen gvenzl/oracle-xe:21)
 - Puerto del host: 1522 (el 1521 lo usa otra Oracle local: NO tocarla)
 - JDBC: jdbc:oracle:thin:@//localhost:1522/XEPDB1
-- Usuario de la app: respaldos / Respaldos123
-- Usuario admin: sys as sysdba / Admin123
+- Usuario de la app: respaldos (clave en `RESPALDOS_DB_CLAVE`)
+- Usuario admin: sys as sysdba (clave en `ORACLE_PASSWORD`)
+- Las claves NO van en el repositorio: están en `.env` (no versionado);
+  la plantilla es `.env.example`.
 - RMAN corre DENTRO del contenedor: `docker exec oracle-xe rman target /`
 - Base en modo ARCHIVELOG
 - Destino persistente de respaldos: /opt/oracle/oradata/respaldos

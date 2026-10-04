@@ -31,3 +31,29 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Dependencias y compilados (tambien en cualquier subcarpeta) ###
+node_modules/
+frontend/dist/
+*.tsbuildinfo
+
+### Configuracion local con claves (plantilla versionada: .env.example) ###
+.env
+.env.*
+!.env.example
+
+### Archivos de respaldo y de Oracle: nunca al repositorio ###
+*.bak
+*.bkp
+*.bck
+*.backup
+*.rman
+*.dmp
+*.dbf
+*.arc
+*.ctl
+*.orig
+*~
+
+### Registros ###
+*.log

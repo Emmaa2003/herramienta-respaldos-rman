@@ -13,6 +13,7 @@ Cómo se ejecuta → Qué evidencia queda.** El guion sigue ese orden.
 ## Antes de empezar (checklist)
 
 - [ ] `docker start oracle-xe` y esperar "DATABASE IS READY TO USE!".
+- [ ] Archivo `.env` con la clave (copia de `.env.example`).
 - [ ] Backend corriendo (`.\mvnw.cmd spring-boot:run` con JDK 25).
 - [ ] Frontend corriendo (`npm run dev` en `frontend/`).
 - [ ] Navegador abierto en **http://localhost:5173**.

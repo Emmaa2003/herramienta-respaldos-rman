@@ -22,15 +22,17 @@ Qué capturar en cada uno está al final de cada escenario, en **Evidencia**.
 
 1. Levantar el contenedor: `docker start oracle-xe` y esperar en `docker logs oracle-xe`
    la línea `DATABASE IS READY TO USE!`.
-2. Backend, desde la raíz del proyecto (con JDK 25):
+2. Credenciales: copiar `.env.example` como `.env` en la raíz y poner la clave real en
+   `RESPALDOS_DB_CLAVE`. `.env` no se versiona.
+3. Backend, desde la raíz del proyecto (con JDK 25):
    ```powershell
-   $env:JAVA_HOME = "C:\Users\emmar\.jdks\openjdk-25.0.2"
+   $env:JAVA_HOME = "<ruta de su JDK 25>"
    .\mvnw.cmd spring-boot:run
    ```
-3. Frontend, desde `frontend/`: `npm run dev` y abrir **http://localhost:5173**.
-4. Escribir su nombre en el campo **Administrador** (arriba a la derecha). Se usa para
+4. Frontend, desde `frontend/`: `npm run dev` y abrir **http://localhost:5173**.
+5. Escribir su nombre en el campo **Administrador** (arriba a la derecha). Se usa para
    aprobar scripts y atender alertas.
-5. En **Bases de datos** debe existir "XE contenedor de pruebas" (contenedor `oracle-xe`,
+6. En **Bases de datos** debe existir "XE contenedor de pruebas" (contenedor `oracle-xe`,
    servicio `XEPDB1`, ambiente PRUEBAS). Si no existe, registrarla con esos datos.
    Pulsar **Inspeccionar**: debe mostrar modo **ARCHIVELOG**, los tablespaces y datafiles
    de XEPDB1 y el mensaje informativo/recomendación correspondiente.
