@@ -10,7 +10,10 @@ export default function Panel({ navegar }: { navegar: Navegar }) {
 
   return (
     <>
-      <h2>Panel</h2>
+      <div className="portada grunge">
+        <h2>Panel</h2>
+        <p>Control preventivo de respaldos: estrategia, validacion, script, aprobacion, ejecucion y evidencia.</p>
+      </div>
       <div className="rejilla">
         {(['ADVERTENCIA', 'RECOMENDACION', 'INFORMATIVO'] as const).map((t) => (
           <div key={t} className="panel clic" onClick={() => navegar({ pagina: 'alertas' })}>
