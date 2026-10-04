@@ -57,7 +57,7 @@ export default function App() {
 
   return (
     <>
-      <header>
+      <header className="grunge">
         <h1>Gestion de estrategias de respaldo Oracle</h1>
         <nav>
           {MENU.map((m) => (
